@@ -18,12 +18,12 @@
 
 # metadata
 " NINJA-IDE Multimedia "
-__version__ = ' 0.1 '
+__version__ = ' 0.2 '
 __license__ = ' GPL '
 __author__ = ' juancarlospaco '
 __email__ = ' juancarlospaco@ubuntu.com '
 __url__ = ''
-__date__ = ' 20/04/2013 '
+__date__ = ' 30/05/2013 '
 __prj__ = ' multimedia '
 __docformat__ = 'html'
 __source__ = ''
@@ -33,14 +33,10 @@ __full_licence__ = ''
 # imports
 from os import path
 
-from PyQt4.QtGui import QIcon
-from PyQt4.QtGui import QLabel
-from PyQt4.QtGui import QDockWidget
-from PyQt4.QtGui import QPushButton
-from PyQt4.QtGui import QFileDialog
+from PyQt4.QtGui import QIcon, QLabel, QDockWidget, QPushButton, QFileDialog
 
 try:
-    from PyKDE4.kdecore import *
+    from PyKDE4.kdecore import KPluginLoader, KUrl
     from PyKDE4.kparts import *
 except ImportError:
     pass
@@ -57,29 +53,28 @@ class Main(plugin.Plugin):
         " Init Class dock "
         self.dock = QDockWidget()
         self.dock.setFeatures(QDockWidget.DockWidgetFloatable |
-                                           QDockWidget.DockWidgetMovable)
+                              QDockWidget.DockWidgetMovable)
         self.dock.setWindowTitle(__doc__)
         self.dock.setStyleSheet('QDockWidget::title{text-align: center;}')
         self.boton = QPushButton(QIcon.fromTheme("media-eject"),
-                                 '  Open Media  ', self.dock)
+                                 ' Open Media ', self.dock)
         try:
             self.factory = KPluginLoader("dragonpart").factory()
             self.part = self.factory.create(self)
             self.boton.clicked.connect(lambda: self.part.openUrl(KUrl(str(
-                QFileDialog.getOpenFileName(self.dock, ' Open Media ',
-                path.expanduser("~"), ';;'.join(['(*%s)' % e for e in [
-                '.ogv', '.webm', '.avi', '.mpg', '.mpeg', '.3gp', '.wmv',
-                '.mp3', '.asf', '.dat', '.flv', '.flac', '.ogg', '.mkv',
-                '.mov', '.swf', '.wav', '.rm', '.m4v', '.aaf', '.mp4', '.raw'
-            ]]))))))
+                QFileDialog.getOpenFileName(self.dock, ' Open Media File ',
+                path.expanduser("~"), ';;'.join(['(*.{})'.format(e) for e in
+                ['ogv', 'webm', 'avi', 'mpg', 'mpeg', '3gp', 'wmv', 'mp3',
+                'asf', 'dat', 'flv', 'flac', 'ogg', 'mkv', 'mov', 'swf', 'wav',
+                'rm', 'm4v', 'aaf', 'mp4', 'raw', '*']]))))))
             self.dock.setWidget(self.part.widget())
         except:
-            self.dock.setWidget(QLabel(""" <center>
-            <h3>ಠ_ಠ<br> ERROR: Please, install Dragon Player App ! </h3><br>
-            <br><i> (Sorry, cant embed non-Qt Apps). </i><center>"""))
+            self.dock.setWidget(QLabel(""" <center> <h3>ಠ_ಠ<br>
+            ERROR: Please, install Dragon Player and PyKDE ! </h3><br>
+            <br><i> (Sorry, cant embed non-Qt Apps). </i>><center>"""))
         self.misc = self.locator.get_service('misc')
         self.misc.add_widget(self.dock,
-                        QIcon.fromTheme("applications-multimedia"), __doc__)
+                            QIcon.fromTheme("applications-multimedia"), __doc__)
 
 
 ###############################################################################
